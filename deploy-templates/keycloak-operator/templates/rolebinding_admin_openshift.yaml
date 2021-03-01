@@ -1,0 +1,15 @@
+{{- if eq .Values.global.platform "openshift" -}}
+apiVersion: authorization.openshift.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.name }}-admin-{{ .Release.Namespace }}
+roleRef:
+  name: admin
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.name }}
+    namespace: {{ .Release.Namespace }}
+userNames:
+  - system:serviceaccount:{{ .Release.Namespace }}:{{ .Values.name }}
+groupNames: []
+{{- end -}}

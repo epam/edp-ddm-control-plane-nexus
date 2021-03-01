@@ -1,0 +1,32 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Values.nexus.serviceAccountName }}-{{ .Release.Namespace }}-clusterrole
+  annotations:
+    openshift.io/description: Role for {{ .Values.nexus.serviceAccountName }}-{{ .Release.Namespace }} service account
+    rbac.authorization.kubernetes.io/autoupdate: 'true'
+rules:
+  - verbs:
+      - get
+      - patch
+    apiGroups:
+      - 'config.openshift.io'
+    resources:
+      - images
+    resourceNames:
+      - cluster
+  - verbs:
+      - list
+      - create
+    apiGroups:
+      - '*'
+    resources:
+      - configmaps
+  - verbs:
+      - '*'
+    apiGroups:
+      - '*'
+    resources:
+      - configmaps
+    resourceNames:
+      - registry-cas

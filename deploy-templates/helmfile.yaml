@@ -1,0 +1,75 @@
+helmDefaults:
+ wait: true
+ timeout: 600
+
+releases:
+ - name: nexus-prerequisites
+   namespace: '{{ requiredEnv "globalNexusNamespace" }}'
+   chart: nexus-prerequisites
+   hooks:
+     - events: [ "postsync" ]
+       showlogs: true
+       command: "oc"
+       args: [ "adm", "policy", "add-scc-to-user", "anyuid", "-z", "nexus", "-n", "{{`{{ .Release.Namespace }}`}}" ]
+     - events: [ "postuninstall" ]
+       showlogs: true
+       command: "oc"
+       args: [ "adm", "policy", "remove-scc-from-user", "anyuid", "-z", "nexus`}}", "-n", "{{`{{ .Release.Namespace }}`}}" ]
+   values:
+    - "nexus-operator/values.yaml"
+    - "values.yaml"
+    - "values.gotmpl"
+ - name: nexus-operator
+   namespace: '{{ requiredEnv "globalNexusNamespace" }}'
+   chart: nexus-operator
+   hooks:
+     - events: ["postsync"]
+       showlogs: true
+       command: "sh"
+       args: ["../scripts/dc_patching.sh", "{{`{{ .Release.Namespace }}`}}"]
+     - events:
+         - presync
+       showlogs: true
+       command: oc
+       args:
+         - adm
+         - policy
+         - add-scc-to-user
+         - privileged
+         - -z
+         - 'dns-fixer'
+         - -n
+         - '{{`{{ .Release.Namespace }}`}}'
+     - events:
+         - postuninstall
+       showlogs: true
+       command: oc
+       args:
+         - adm
+         - policy
+         - remove-scc-from-user
+         - privileged
+         - -z
+         - 'dns-fixer'
+         - -n
+         - '{{`{{ .Release.Namespace }}`}}'
+   values:
+     - "nexus-operator/values.yaml"
+     - "values.yaml"
+     - "values.gotmpl"
+   needs:
+     - '{{ env "globalNexusNamespace" }}/nexus-prerequisites'
+# - name: keycloak-operator
+#   namespace: control-plane-nexus
+#   chart: keycloak-operator
+#   labels:
+#     update_scc: true
+#   values:
+#     - "keycloak-operator/values.yaml"
+#     - "values.yaml"
+#     - operator:
+#         clusterRoleName: keycloak-operator-control-plane-nexus-clusterrole
+#   hooks:
+#     - events: [ "postsync" ]
+#       command: "bash"
+#       args: [ "../scripts/copy_keycloak_secret.sh", "keycloak", "{{`{{ .Release.Namespace }}`}}"]

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-script
+data:
+  init-script: |
+    pwd;
+    mkdir -p /nexus-data/etc/ssl
+    keytool -genkeypair -keystore /nexus-data/etc/ssl/keystore.jks -storepass password -alias {{ .Release.Namespace }} \
+    -keyalg RSA -keysize 2048 -validity 5000 -keypass password \
+    -dname 'CN=docker-registry.{{ .Release.Namespace }}.svc, OU=Infrastructure, O=EPAM, L=Unspecified, ST=Unspecified, C=UA' \
+    -ext 'SAN=DNS:docker-registry.{{ .Release.Namespace }}.svc,DNS:nexus.{{ .Release.Namespace }}.svc';
+
+    keytool -importkeystore -noprompt -srckeystore /nexus-data/etc/ssl/keystore.jks -srcstorepass password -keypass password -destkeystore /nexus-data/etc/ssl/keystore.p12 -deststorepass "password" -deststoretype PKCS12;
+    openssl pkcs12 -nokeys -password pass:password -passin pass:password -in /nexus-data/etc/ssl/keystore.p12 -out /nexus-data/etc/ssl/docker-registry.pem;
+
+    cd /nexus-data
+    if [ ! -f oc.tar.gz ]; then
+      wget https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz ;
+      tar -zvxf oc.tar.gz;
+    fi
+    ./oc delete configmap registry-cas -n openshift-config
+    ./oc create configmap registry-cas -n openshift-config --from-file=docker-registry.{{ .Release.Namespace }}.svc..5000=/nexus-data/etc/ssl/docker-registry.pem \
+                          --from-file=docker-registry.{{ .Release.Namespace }}.svc..5020=/nexus-data/etc/ssl/docker-registry.pem \
+                          --from-file=docker-registry.{{ .Release.Namespace }}.svc..5004=/nexus-data/etc/ssl/docker-registry.pem \
+                          --from-file=docker-registry.{{ .Release.Namespace }}.svc..5005=/nexus-data/etc/ssl/docker-registry.pem
+    ./oc patch image.config.openshift.io/cluster --patch '{"spec":{"additionalTrustedCA":{"name":"registry-cas"}}}' --type=merge
+
+

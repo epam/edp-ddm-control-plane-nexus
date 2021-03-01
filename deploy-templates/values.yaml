@@ -1,0 +1,4 @@
+global:
+  platform: openshift
+  admins: []
+  developers: []

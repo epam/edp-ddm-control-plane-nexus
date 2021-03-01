@@ -1,0 +1,8 @@
+apiVersion: v1
+description: Helmfile chart for Golang application/service deploying
+name: nexus-prerequisites
+version: 1.2.0
+appVersion: 2.7.0
+keywords:
+    - Golang
+home: https://www.epam.com
