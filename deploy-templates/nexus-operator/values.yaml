@@ -1,0 +1,52 @@
+name: nexus-operator
+operator:
+  image:
+    name: epamedp/nexus-operator
+    version: 2.11.0-SNAPSHOT.4
+  serviceAccountName: nexus-operator
+  clusterRoleName: nexus-operator-clusterrole
+
+global:
+  nexus: {}
+#  nexus:
+#    readers:
+#      - regularuser1@epam.com
+#      - regularuser2@epam.com
+#    administrators:
+#      - adminuser1@epam.com
+#      - adminuser2@epam.com
+
+nexus:
+  image:
+    name: sonatype/nexus3
+    version: 3.30.0
+  storage:
+    size: 100Gi
+  basePath: 'nexus'
+  serviceAccountName: nexus
+  resources:
+    limits:
+      memory: 3Gi
+    requests:
+      cpu: 100m
+      memory: 1.5Gi
+  dockerRegistry:
+    hosted:
+      httpPort: "null"
+      httpsPort: 5000
+    dockerhub:
+      httpPort: "null"
+      httpsPort: 5020
+      auth:
+        username: "mock"
+        password: "mock"
+    group:
+      httpPort: "null"
+      httpsPort: 5004
+
+keycloakIntegration:
+  enabled: true
+  realm: admin
+  roles:
+    - nexus-admin
+    - nexus-user

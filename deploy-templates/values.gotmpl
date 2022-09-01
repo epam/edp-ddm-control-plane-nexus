@@ -1,0 +1,23 @@
+#helm values
+dnsWildcard: {{ requiredEnv "dnsWildcard" }}
+nexus:
+  dockerRegistry:
+    dockerhub:
+      auth:
+        username: {{ env "dockerhub_username" }}
+        password: {{ env "dockerhub_password" }}
+  storage:
+    size: 100Gi
+
+global:
+  edpName: {{ requiredEnv "globalNexusNamespace" }}
+  storageClass: {{ env "platformStorageClass" | default "gp2" }}
+  whiteListIP:
+    adminRoutes: {{ env "ADMIN_ROUTES_WHITELIST_CIDR" }}
+
+keycloak:
+  host: platform-keycloak.{{ requiredEnv "dnsWildcard" }}
+  url: https://platform-keycloak.{{ requiredEnv "dnsWildcard" }}
+
+cloud:
+  provider: {{ requiredEnv "cloudProvider" }}

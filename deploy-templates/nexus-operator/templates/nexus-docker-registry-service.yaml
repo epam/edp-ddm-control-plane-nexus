@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: docker-registry
+  labels:
+    app: nexus
+  {{- include "nexus-operator.metaLabels" . | nindent 4 }}
+spec:
+  ports:
+    - name: docker-hosted-https
+      port: {{ .Values.nexus.dockerRegistry.hosted.httpsPort }}
+      targetPort: {{ .Values.nexus.dockerRegistry.hosted.httpsPort }}
+      protocol: TCP
+    - name: docker-group-https
+      port: {{ .Values.nexus.dockerRegistry.group.httpsPort }}
+      targetPort: {{ .Values.nexus.dockerRegistry.group.httpsPort }}
+      protocol: TCP
+  selector:
+    app: nexus
+  sessionAffinity: None
+  type: ClusterIP
