@@ -82,6 +82,8 @@ spec:
           ports:
             - containerPort: 8081
               protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
           readinessProbe:
             failureThreshold: 3
             initialDelaySeconds: 30

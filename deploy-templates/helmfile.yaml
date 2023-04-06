@@ -23,10 +23,6 @@ releases:
    namespace: '{{ requiredEnv "globalNexusNamespace" }}'
    chart: nexus-operator
    hooks:
-     - events: ["postsync"]
-       showlogs: true
-       command: "sh"
-       args: ["../scripts/dc_patching.sh", "{{`{{ .Release.Namespace }}`}}"]
      - events:
          - presync
        showlogs: true
