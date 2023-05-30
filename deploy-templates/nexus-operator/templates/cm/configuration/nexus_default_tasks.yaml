@@ -11,6 +11,14 @@ data:
         }
       },
       {
+        "name": "compact-blobstore-docker-registry",
+        "cron": "0 10 9 * * ?",
+        "typeId": "blobstore.compact",
+        "taskProperties": {
+          "blobstoreName": "docker-registry"
+        }
+      },
+      {
         "name": "purge-unused-components-and-assets",
         "cron": "0 40 9 * * ?",
         "typeId": "repository.purge-unused",
