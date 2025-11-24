@@ -36,7 +36,7 @@ spec:
             - "sh"
           args:
             - "./init-script.sh"
-          image: 'openjdk:8'
+          image: 'adoptopenjdk/openjdk8:jre'
           imagePullPolicy: IfNotPresent
           securityContext: { }
           volumeMounts:

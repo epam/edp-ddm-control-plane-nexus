@@ -16,7 +16,7 @@ data:
 
     cd /nexus-data
     if [ ! -f oc.tar.gz ]; then
-      wget https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz ;
+      curl -fsSL -o oc.tar.gz https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz ;
       tar -zvxf oc.tar.gz;
     fi
     ./oc delete configmap registry-cas -n openshift-config
